@@ -14,8 +14,13 @@ import { Image } from "expo-image";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
 
+interface ImageType {
+  uri: string;
+  note: string;
+}
+
 export default function AboutScreen() {
-  const [images, setImages] = useState<{ uri: string; note: string }[]>([]);
+  const [images, setImages] = useState<ImageType[]>([]);
   const [note, setNote] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState<{
@@ -52,7 +57,7 @@ export default function AboutScreen() {
     }
   };
 
-  const openNoteModal = (image) => {
+  const openNoteModal = (image: ImageType) => {
     setSelectedImage(image);
     setIsNoteModalVisible(true);
   };
