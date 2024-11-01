@@ -8,11 +8,7 @@ import {
 } from "react-native";
 import { Image } from "expo-image";
 import { Dimensions } from "react-native";
-
-interface ImageType {
-  uri: string;
-  note: string;
-}
+import { ImageType } from "@/app/(tabs)/scrapbook";
 
 interface ImageGalleryProps {
   images: ImageType[];

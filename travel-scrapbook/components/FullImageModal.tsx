@@ -17,7 +17,7 @@ import { useEffect } from "react";
 
 interface FullImageModalProps {
   visible: boolean;
-  image: { uri: string; note: string } | null;
+  image: { uri: string; note: string; date: string | Date } | null;
   onClose: () => void;
   onEdit: (newNote: string) => void;
   onDelete: () => void;
@@ -44,6 +44,17 @@ export default function FullImageModal({
     setIsEditing(false);
   };
 
+  const formattedDate = image?.date
+    ? new Date(
+        typeof image.date === "string" ? Date.parse(image.date) : image.date
+      ).toLocaleDateString()
+    : "Date not available";
+
+  console.log(image?.note);
+  console.log("image.date:", image?.date); // logs the raw date value
+  console.log("Type of image.date:", typeof image?.date); // logs the type (string, Date, etc.)
+  console.log("formattedDate:", formattedDate);
+
   return (
     <Modal visible={visible} transparent animationType="fade">
       <View style={styles.modalContainer}>
@@ -54,6 +65,7 @@ export default function FullImageModal({
           >
             {image && (
               <>
+                <Text style={styles.date}>{formattedDate}</Text>
                 <Image source={image.uri} style={styles.image} />
                 {isEditing ? (
                   <TextInput
@@ -116,7 +128,7 @@ const styles = StyleSheet.create({
   },
   content: {
     alignItems: "center",
-    padding: 20,
+    padding: 10,
     backgroundColor: "#25292e",
     borderRadius: 10,
     width: screenWidth * 0.9,
@@ -124,12 +136,18 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 20,
   },
+  date: {
+    color: "#fff",
+    alignSelf: "flex-start",
+    paddingLeft: 20,
+    paddingTop: 5,
+  },
   image: {
     width: "90%",
     aspectRatio: 3 / 4,
     borderRadius: 18,
     marginBottom: 20,
-    marginTop: 30,
+    marginTop: 20,
   },
   note: {
     color: "#fff",
