@@ -33,7 +33,6 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     margin: 5,
-    backgroundColor: "#25292e", // Background color for the button
   },
 });
 

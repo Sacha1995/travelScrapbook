@@ -1,5 +1,6 @@
 import { Text, View } from "react-native";
 import { StyleSheet } from "react-native";
+import { useEffect } from "react";
 
 export default function Index() {
   return (

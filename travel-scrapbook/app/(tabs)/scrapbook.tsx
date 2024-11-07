@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import CircleButton from "@/components/CircleButton";
 import * as ImagePicker from "expo-image-picker";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import ImageGallery from "@/components/ImageGallery";
 import AddNoteModal from "@/components/AddNoteModal";
 import FullImageModal from "@/components/FullImageModal";
 import AddDateModal from "@/components/AddDateModal";
+import useTripsStore from "@/src/useTripsStore";
 
 export interface ImageType {
   uri: string;
@@ -15,6 +15,7 @@ export interface ImageType {
 }
 
 export default function AboutScreen() {
+  const { trips, selectedTrip, setImagesForTrip } = useTripsStore();
   const [images, setImages] = useState<ImageType[]>([]);
   const [note, setNote] = useState<string>("");
   const [date, setDate] = useState(new Date());
@@ -23,26 +24,18 @@ export default function AboutScreen() {
   const [selectedImage, setSelectedImage] = useState<ImageType | null>(null);
   const [newImage, setNewImage] = useState<ImageType | null>(null);
 
+  // Load images whenever the selectedTrip changes
   useEffect(() => {
-    loadImages();
-  }, []);
-
-  const loadImages = async () => {
-    try {
-      const savedImages = await AsyncStorage.getItem("images");
-      if (savedImages) setImages(JSON.parse(savedImages));
-    } catch (error) {
-      console.error("Failed to load images", error);
+    if (selectedTrip && trips[selectedTrip]) {
+      setImages(trips[selectedTrip]);
+    } else {
+      setImages([]); // Reset images if no selected trip or trip is empty
     }
-  };
+  }, [selectedTrip, trips]);
 
-  const saveImages = async (newImages: ImageType[]) => {
-    try {
-      await AsyncStorage.setItem("images", JSON.stringify(newImages));
-      setImages(newImages);
-    } catch (error) {
-      console.error("Failed to save images", error);
-    }
+  const saveImages = (newImages: ImageType[]) => {
+    setImagesForTrip(selectedTrip, newImages); // Use Zustand action
+    setImages(newImages);
   };
 
   const pickImageAsync = async () => {
@@ -50,7 +43,7 @@ export default function AboutScreen() {
       allowsEditing: true,
       quality: 1,
     });
-    if (!result.canceled) {
+    if (!result.canceled && result.assets.length > 0) {
       setNewImage({ uri: result.assets[0].uri, note: "", date: new Date() });
       setIsNoteModalVisible(true);
     }
@@ -109,12 +102,19 @@ export default function AboutScreen() {
     }
   };
 
+  if (!trips || Object.keys(trips).length === 0) {
+    return <Text>No trips available. Please add a trip.</Text>;
+  }
+
   return (
     <View style={styles.container}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.contentContainer}
+        contentContainerStyle={[
+          styles.contentContainer,
+          images.length === 0 && styles.centerText,
+        ]}
       >
         {images.length > 0 ? (
           <ImageGallery
@@ -164,6 +164,9 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     alignItems: "center",
   },
-  text: { color: "#fff" },
+  centerText: {
+    justifyContent: "center",
+  },
+  text: { color: "#fff", justifyContent: "center" },
   circleButton: { position: "absolute", bottom: 10, right: -50 },
 });
