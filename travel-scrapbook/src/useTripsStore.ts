@@ -1,19 +1,34 @@
 import { create } from "zustand";
+import { Region } from "react-native-maps";
+
+interface Coordinates {
+  latitude: number;
+  longitude: number;
+  latitudeDelta?: number;
+  longitudeDelta?: number;
+}
 
 interface ImageType {
   uri: string;
   note: string;
   date: string | Date;
+  coordinates?: Coordinates;
+}
+
+interface Trip {
+  images: ImageType[];
+  coordinates?: Coordinates;
 }
 
 interface TripsState {
-  trips: Record<string, ImageType[]>;
+  trips: Record<string, Trip>;
   selectedTrip: string;
 
-  setTrips: (newTrips: Record<string, ImageType[]>) => void;
+  setTrips: (newTrips: Record<string, Trip>) => void;
   addTrip: (tripName: string) => void;
   updateSelectedTrip: (tripName: string) => void;
   setImagesForTrip: (tripName: string, images: ImageType[]) => void;
+  setCoordinatesForTrip: (tripName: string, coordinates: Coordinates) => void;
 }
 
 const useTripsStore = create<TripsState>((set) => ({
@@ -29,7 +44,7 @@ const useTripsStore = create<TripsState>((set) => ({
     set((state) => ({
       trips: {
         ...state.trips,
-        [tripName]: [],
+        [tripName]: { images: [], coordinates: undefined },
       },
     })),
 
@@ -42,7 +57,21 @@ const useTripsStore = create<TripsState>((set) => ({
     set((state) => ({
       trips: {
         ...state.trips,
-        [tripName]: images,
+        [tripName]: {
+          ...state.trips[tripName],
+          images: images,
+        },
+      },
+    })),
+
+  setCoordinatesForTrip: (tripName, coordinates) =>
+    set((state) => ({
+      trips: {
+        ...state.trips,
+        [tripName]: {
+          ...state.trips[tripName],
+          coordinates,
+        },
       },
     })),
 }));

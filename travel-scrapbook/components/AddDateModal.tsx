@@ -32,7 +32,6 @@ export default function AddDateModal({
   const handleDateChange = (event: any, selectedDate: Date | undefined) => {
     setShowPicker(false);
     if (selectedDate) {
-      console.log("selectedDate", selectedDate);
       onChangeDate(selectedDate);
     }
   };

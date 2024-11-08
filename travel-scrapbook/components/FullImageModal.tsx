@@ -50,11 +50,6 @@ export default function FullImageModal({
       ).toLocaleDateString()
     : "Date not available";
 
-  console.log(image?.note);
-  console.log("image.date:", image?.date); // logs the raw date value
-  console.log("Type of image.date:", typeof image?.date); // logs the type (string, Date, etc.)
-  console.log("formattedDate:", formattedDate);
-
   return (
     <Modal visible={visible} transparent animationType="fade">
       <View style={styles.modalContainer}>

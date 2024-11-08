@@ -23,8 +23,6 @@ const RootLayout = () => {
         const parsedTrips = savedTrips ? JSON.parse(savedTrips) : {};
         setTrips(parsedTrips);
 
-        console.log("Loaded trips:", parsedTrips);
-
         if (Object.keys(parsedTrips).length > 0) {
           updateSelectedTrip(Object.keys(parsedTrips)[0]);
         } else {
@@ -76,8 +74,6 @@ const RootLayout = () => {
   const cancelDelete = () => {
     setIsConfirmDeleteVisible(false);
   };
-
-  console.log("Current selectedTrip:", selectedTrip, "Current trips:", trips);
 
   return (
     <View style={{ flex: 1 }}>

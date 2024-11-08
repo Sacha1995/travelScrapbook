@@ -27,14 +27,14 @@ export default function AboutScreen() {
   // Load images whenever the selectedTrip changes
   useEffect(() => {
     if (selectedTrip && trips[selectedTrip]) {
-      setImages(trips[selectedTrip]);
+      setImages(trips[selectedTrip].images || []);
     } else {
-      setImages([]); // Reset images if no selected trip or trip is empty
+      setImages([]);
     }
   }, [selectedTrip, trips]);
 
   const saveImages = (newImages: ImageType[]) => {
-    setImagesForTrip(selectedTrip, newImages); // Use Zustand action
+    setImagesForTrip(selectedTrip, newImages);
     setImages(newImages);
   };
 
@@ -103,7 +103,11 @@ export default function AboutScreen() {
   };
 
   if (!trips || Object.keys(trips).length === 0) {
-    return <Text>No trips available. Please add a trip.</Text>;
+    return (
+      <Text style={[styles.container, styles.addTrip]}>
+        No trips available. Please add a trip.
+      </Text>
+    );
   }
 
   return (
@@ -122,7 +126,7 @@ export default function AboutScreen() {
             onImagePress={(image: ImageType) => setSelectedImage(image)}
           />
         ) : (
-          <Text style={styles.text}>Add an image</Text>
+          <Text style={[styles.text, styles.addTrip]}>Add an image</Text>
         )}
 
         <AddNoteModal
@@ -169,4 +173,9 @@ const styles = StyleSheet.create({
   },
   text: { color: "#fff", justifyContent: "center" },
   circleButton: { position: "absolute", bottom: 10, right: -50 },
+  addTrip: {
+    color: "#fff",
+    textAlign: "center",
+    paddingTop: 20,
+  },
 });
