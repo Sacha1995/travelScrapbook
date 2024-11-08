@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Region } from "react-native-maps";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface Coordinates {
   latitude: number;
@@ -35,45 +35,78 @@ const useTripsStore = create<TripsState>((set) => ({
   trips: {},
   selectedTrip: "",
 
-  setTrips: (newTrips) =>
+  setTrips: (newTrips) => {
+    AsyncStorage.setItem("trips", JSON.stringify(newTrips)).catch(
+      console.error
+    );
     set(() => ({
       trips: newTrips,
-    })),
+    }));
+  },
 
-  addTrip: (tripName) =>
-    set((state) => ({
-      trips: {
+  addTrip: (tripName) => {
+    set((state) => {
+      const updatedTrips = {
         ...state.trips,
         [tripName]: { images: [], coordinates: undefined },
-      },
-    })),
+      };
+      AsyncStorage.setItem("trips", JSON.stringify(updatedTrips)).catch(
+        console.error
+      );
+      return { trips: updatedTrips };
+    });
+  },
 
   updateSelectedTrip: (tripName) =>
     set(() => ({
       selectedTrip: tripName,
     })),
 
-  setImagesForTrip: (tripName, images) =>
-    set((state) => ({
-      trips: {
+  setImagesForTrip: (tripName, images) => {
+    set((state) => {
+      const updatedTrips = {
         ...state.trips,
         [tripName]: {
           ...state.trips[tripName],
           images: images,
         },
-      },
-    })),
+      };
+      AsyncStorage.setItem("trips", JSON.stringify(updatedTrips)).catch(
+        console.error
+      );
+      return { trips: updatedTrips };
+    });
+  },
 
-  setCoordinatesForTrip: (tripName, coordinates) =>
-    set((state) => ({
-      trips: {
+  setCoordinatesForTrip: (tripName, coordinates) => {
+    set((state) => {
+      const updatedTrips = {
         ...state.trips,
         [tripName]: {
           ...state.trips[tripName],
           coordinates,
         },
-      },
-    })),
+      };
+      AsyncStorage.setItem("trips", JSON.stringify(updatedTrips)).catch(
+        console.error
+      );
+      return { trips: updatedTrips };
+    });
+  },
 }));
+
+const loadTrips = async () => {
+  try {
+    const tripsData = await AsyncStorage.getItem("trips");
+    if (tripsData) {
+      const trips = JSON.parse(tripsData);
+      useTripsStore.getState().setTrips(trips);
+    }
+  } catch (error) {
+    console.error("Failed to load trips from AsyncStorage:", error);
+  }
+};
+
+loadTrips();
 
 export default useTripsStore;

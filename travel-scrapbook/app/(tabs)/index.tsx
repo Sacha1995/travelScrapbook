@@ -1,12 +1,5 @@
 import React, { useState } from "react";
-import {
-  TextInput,
-  Button,
-  View,
-  StyleSheet,
-  Text,
-  ScrollView,
-} from "react-native";
+import { TextInput, Button, View, StyleSheet, Text, Image } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import axios from "axios";
 import * as ImagePicker from "expo-image-picker";
@@ -14,6 +7,7 @@ import { OPENCAGE_API_KEY } from "@env";
 import AddNoteModal from "@/components/AddNoteModal";
 import AddDateModal from "@/components/AddDateModal";
 import useTripsStore from "@/src/useTripsStore";
+import { useEffect } from "react";
 
 type Coordinates = {
   latitude: number;
@@ -26,23 +20,34 @@ type ImageType = {
   uri: string;
   note: string;
   date: string | Date;
-  coordinates: Coordinates;
+  coordinates?: Coordinates;
 };
 
 export default function Index() {
   const { selectedTrip, setImagesForTrip, setCoordinatesForTrip, trips } =
     useTripsStore();
-  const tripCoordinates = trips[selectedTrip]?.coordinates;
+  const trip = trips[selectedTrip] || { images: [], coordinates: undefined };
+  const tripCoordinates = trip.coordinates;
   const [location, setLocation] = useState("");
   const [coordinates, setCoordinates] = useState<Coordinates | null>(null);
   const [error, setError] = useState("");
-  const [markers, setMarkers] = useState<ImageType[]>([]);
-  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+  const [markers, setMarkers] = useState<ImageType[]>(trip.images);
   const [newImage, setNewImage] = useState<ImageType | null>(null);
   const [note, setNote] = useState<string>("");
   const [date, setDate] = useState<Date | string>(new Date());
   const [isNoteModalVisible, setIsNoteModalVisible] = useState<boolean>(false);
   const [isDateModalVisible, setIsDateModalVisible] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (tripCoordinates) {
+      setCoordinates({
+        latitude: tripCoordinates.latitude,
+        longitude: tripCoordinates.longitude,
+        latitudeDelta: tripCoordinates.latitudeDelta || 0.1,
+        longitudeDelta: tripCoordinates.longitudeDelta || 0.1,
+      });
+    }
+  }, [selectedTrip, tripCoordinates]);
 
   // Function to get coordinates using HERE Geocoding API
   const getCoordinates = async (locationName: string) => {
@@ -179,7 +184,7 @@ export default function Index() {
                 ></MapView>
               </View>
               <Button
-                title="Confirm Location"
+                title="Confirm Map"
                 onPress={handleConfirmLocation} // Save coordinates to store when confirmed
               />
             </View>
@@ -214,14 +219,32 @@ export default function Index() {
             }
             onPress={handleMapPress}
           >
-            {markers.map((marker, index) => (
-              <Marker
-                key={index}
-                coordinate={marker.coordinates}
-                title="Picture Location"
-                description={marker.note}
-              />
-            ))}
+            {markers.length > 0 &&
+              markers.map((marker, index) => {
+                // Only render the Marker if the coordinates exist
+                if (marker.coordinates) {
+                  return (
+                    <Marker
+                      key={index}
+                      coordinate={marker.coordinates}
+                      title={marker.note}
+                    >
+                      {/* <Callout>
+                        <View style={styles.callout}>
+                          <Image
+                            source={{ uri: marker.uri }}
+                            style={styles.calloutImage}
+                          />
+                          <Text>{marker.note}</Text>
+                          <Text>{marker.date.toString()}</Text>
+                        </View>
+                      </Callout> */}
+                    </Marker>
+                  );
+                }
+                // Return null if coordinates are not present
+                return null;
+              })}
           </MapView>
 
           <AddNoteModal
@@ -286,5 +309,18 @@ const styles = StyleSheet.create({
   error: {
     color: "red",
     marginTop: 10,
+  },
+  callout: {
+    width: 200,
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: "#fff",
+    alignItems: "center",
+  },
+  calloutImage: {
+    width: 150,
+    height: 100,
+    marginBottom: 10,
+    borderRadius: 8,
   },
 });
