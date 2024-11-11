@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { TextInput, Button, View, StyleSheet, Text, Image } from "react-native";
-import MapView, { Marker } from "react-native-maps";
+import MapView, { Marker, Callout } from "react-native-maps";
 import axios from "axios";
 import * as ImagePicker from "expo-image-picker";
 import { OPENCAGE_API_KEY } from "@env";
@@ -48,6 +48,12 @@ export default function Index() {
       });
     }
   }, [selectedTrip, tripCoordinates]);
+
+  useEffect(() => {
+    if (trips[selectedTrip]) {
+      setMarkers(trips[selectedTrip].images);
+    }
+  }, [selectedTrip, trips]);
 
   // Function to get coordinates using HERE Geocoding API
   const getCoordinates = async (locationName: string) => {
@@ -128,7 +134,7 @@ export default function Index() {
   const saveDate = () => {
     if (newImage) {
       const finalImage = { ...newImage, date };
-      const updatedMarkers = [...markers, finalImage];
+      const updatedMarkers = [...trip.images, finalImage];
       setMarkers(updatedMarkers);
       setImagesForTrip(selectedTrip, updatedMarkers);
       setNewImage(null);
@@ -150,7 +156,7 @@ export default function Index() {
   const handleSkipDate = () => {
     if (newImage) {
       const updatedImage = { ...newImage, date: new Date() };
-      const updatedMarkers = [...markers, updatedImage];
+      const updatedMarkers = [...trip.images, updatedImage];
       setMarkers(updatedMarkers);
       setImagesForTrip(selectedTrip, updatedMarkers);
       setNewImage(null);
@@ -223,22 +229,32 @@ export default function Index() {
               markers.map((marker, index) => {
                 // Only render the Marker if the coordinates exist
                 if (marker.coordinates) {
+                  console.log(marker.uri);
+
                   return (
                     <Marker
                       key={index}
                       coordinate={marker.coordinates}
                       title={marker.note}
                     >
-                      {/* <Callout>
+                      <Callout>
                         <View style={styles.callout}>
                           <Image
                             source={{ uri: marker.uri }}
                             style={styles.calloutImage}
+                            onError={(e) =>
+                              console.log(
+                                "Error loading image:",
+                                e.nativeEvent.error
+                              )
+                            }
+                            onLoad={() =>
+                              console.log("Image loaded successfully!")
+                            }
                           />
                           <Text>{marker.note}</Text>
-                          <Text>{marker.date.toString()}</Text>
                         </View>
-                      </Callout> */}
+                      </Callout>
                     </Marker>
                   );
                 }
