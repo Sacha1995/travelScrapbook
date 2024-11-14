@@ -8,6 +8,7 @@ import AddNoteModal from "@/components/AddNoteModal";
 import AddDateModal from "@/components/AddDateModal";
 import useTripsStore from "@/src/useTripsStore";
 import { useEffect } from "react";
+import ExpoImage from "expo-image/build/ExpoImage";
 
 type Coordinates = {
   latitude: number;
@@ -229,8 +230,6 @@ export default function Index() {
               markers.map((marker, index) => {
                 // Only render the Marker if the coordinates exist
                 if (marker.coordinates) {
-                  console.log(marker.uri);
-
                   return (
                     <Marker
                       key={index}
@@ -239,19 +238,12 @@ export default function Index() {
                     >
                       <Callout>
                         <View style={styles.callout}>
-                          <Image
-                            source={{ uri: marker.uri }}
-                            style={styles.calloutImage}
-                            onError={(e) =>
-                              console.log(
-                                "Error loading image:",
-                                e.nativeEvent.error
-                              )
-                            }
-                            onLoad={() =>
-                              console.log("Image loaded successfully!")
-                            }
-                          />
+                          <View style={styles.calloutImageContainer}>
+                            <ExpoImage
+                              source={[{ uri: marker.uri }]}
+                              style={styles.calloutImage}
+                            />
+                          </View>
                           <Text>{marker.note}</Text>
                         </View>
                       </Callout>
@@ -333,10 +325,17 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
   },
-  calloutImage: {
-    width: 150,
-    height: 100,
+  calloutImageContainer: {
+    width: 180,
+    height: 200,
     marginBottom: 10,
-    borderRadius: 8,
+    resizeMode: "cover",
+    borderRadius: 20,
+    overflow: "hidden",
+  },
+  calloutImage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
   },
 });
