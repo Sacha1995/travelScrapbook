@@ -6,7 +6,7 @@ import { Picker } from "@react-native-picker/picker";
 import AddTripModal from "@/components/AddTripModal";
 import useTripsStore from "@/src/useTripsStore";
 import IconButton from "@/components/IconButton";
-import RNPickerSelect from "react-native-picker-select";
+import { ThemeProvider } from "@shopify/restyle";
 
 const RootLayout = () => {
   const { trips, selectedTrip, setTrips, addTrip, updateSelectedTrip } =
@@ -76,72 +76,74 @@ const RootLayout = () => {
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      <Stack>
-        <Stack.Screen
-          name="(tabs)"
-          initialParams={{
-            selectedTrip: selectedTrip || "",
-            trips: trips || {},
-          }}
-          options={{
-            headerTitle: () => (
-              <View style={styles.pickerContainer}>
-                {selectedTrip && (
-                  <IconButton
-                    iconName="delete"
-                    onPress={() => setIsConfirmDeleteVisible(true)}
-                    color="red"
-                    size={32}
-                  />
-                )}
-                <Picker
-                  selectedValue={selectedTrip}
-                  onValueChange={updateTrip}
-                  style={styles.picker}
-                >
-                  {Object.keys(trips).map((trip) => (
-                    <Picker.Item label={trip} value={trip} key={trip} />
-                  ))}
-                  <Picker.Item label="Add New Trip" value="addNewTrip" />
-                </Picker>
-              </View>
-            ),
-          }}
+    <ThemeProvider theme={theme}>
+      <View style={{ flex: 1 }}>
+        <Stack>
+          <Stack.Screen
+            name="(tabs)"
+            initialParams={{
+              selectedTrip: selectedTrip || "",
+              trips: trips || {},
+            }}
+            options={{
+              headerTitle: () => (
+                <View style={styles.pickerContainer}>
+                  {selectedTrip && (
+                    <IconButton
+                      iconName="delete"
+                      onPress={() => setIsConfirmDeleteVisible(true)}
+                      color="red"
+                      size={32}
+                    />
+                  )}
+                  <Picker
+                    selectedValue={selectedTrip}
+                    onValueChange={updateTrip}
+                    style={styles.picker}
+                  >
+                    {Object.keys(trips).map((trip) => (
+                      <Picker.Item label={trip} value={trip} key={trip} />
+                    ))}
+                    <Picker.Item label="Add New Trip" value="addNewTrip" />
+                  </Picker>
+                </View>
+              ),
+            }}
+          />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+        <AddTripModal
+          isModalVisible={isModalVisible}
+          addNewTrip={addNewTrip}
+          setIsModalVisible={setIsModalVisible}
+          setNewTripName={setNewTripName}
+          newTripName={newTripName}
         />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <AddTripModal
-        isModalVisible={isModalVisible}
-        addNewTrip={addNewTrip}
-        setIsModalVisible={setIsModalVisible}
-        setNewTripName={setNewTripName}
-        newTripName={newTripName}
-      />
-      {/* Confirmation Modal for Deleting Trip */}
-      <Modal
-        transparent={true}
-        visible={isConfirmDeleteVisible}
-        animationType="fade"
-        onRequestClose={cancelDelete}
-      >
-        <View style={styles.modalBackground}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalText}>
-              Are you sure you want to delete this trip?
-            </Text>
-            <View style={styles.modalButtonsContainer}>
-              <Button title="Cancel" onPress={cancelDelete} />
-              <Button
-                title="Yes, Delete"
-                color="red"
-                onPress={handleDeleteTrip}
-              />
+        {/* Confirmation Modal for Deleting Trip */}
+        <Modal
+          transparent={true}
+          visible={isConfirmDeleteVisible}
+          animationType="fade"
+          onRequestClose={cancelDelete}
+        >
+          <View style={styles.modalBackground}>
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalText}>
+                Are you sure you want to delete this trip?
+              </Text>
+              <View style={styles.modalButtonsContainer}>
+                <Button title="Cancel" onPress={cancelDelete} />
+                <Button
+                  title="Yes, Delete"
+                  color="red"
+                  onPress={handleDeleteTrip}
+                />
+              </View>
             </View>
           </View>
-        </View>
-      </Modal>
-    </View>
+        </Modal>
+      </View>
+    </ThemeProvider>
   );
 };
 
