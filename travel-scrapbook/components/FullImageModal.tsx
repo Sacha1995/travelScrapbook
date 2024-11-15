@@ -1,14 +1,15 @@
 import React from "react";
 import {
   View,
-  Text,
   Modal,
   TouchableOpacity,
   StyleSheet,
   TextInput,
   ScrollView,
 } from "react-native";
-import { Image } from "expo-image";
+import Box from "./restyle/Box";
+import Text from "./restyle/Text";
+import ThemedImage from "./restyle/Image";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
 import IconButton from "./IconButton";
@@ -52,16 +53,35 @@ export default function FullImageModal({
 
   return (
     <Modal visible={visible} transparent animationType="fade">
-      <View style={styles.modalContainer}>
-        <View style={styles.contentWrapper}>
+      <Box
+        flex={1}
+        justifyContent="center"
+        alignItems="center"
+        backgroundColor="modalBackground"
+      >
+        <Box width="100%" alignItems="center">
           <ScrollView
             contentContainerStyle={styles.content}
             showsVerticalScrollIndicator={false}
           >
             {image && (
               <>
-                <Text style={styles.date}>{formattedDate}</Text>
-                <Image source={image.uri} style={styles.image} />
+                <Text
+                  color="text"
+                  alignSelf="flex-start"
+                  paddingLeft="l"
+                  paddingTop="s"
+                >
+                  {formattedDate}
+                </Text>
+                <ThemedImage
+                  source={{ uri: image.uri }}
+                  width="90%"
+                  aspectRatio={3 / 4}
+                  borderRadius={18}
+                  marginBottom="l"
+                  marginTop="l"
+                />
                 {isEditing ? (
                   <TextInput
                     style={styles.noteInput}
@@ -102,8 +122,8 @@ export default function FullImageModal({
               <MaterialIcons name="close" size={32} color="#ffd33d" />
             </TouchableOpacity>
           </ScrollView>
-        </View>
-      </View>
+        </Box>
+      </Box>
     </Modal>
   );
 }
@@ -117,10 +137,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.9)",
   },
-  contentWrapper: {
-    width: "100%",
-    alignItems: "center",
-  },
   content: {
     alignItems: "center",
     padding: 10,
@@ -130,19 +146,6 @@ const styles = StyleSheet.create({
     maxWidth: 400,
     marginTop: 20,
     marginBottom: 20,
-  },
-  date: {
-    color: "#fff",
-    alignSelf: "flex-start",
-    paddingLeft: 20,
-    paddingTop: 5,
-  },
-  image: {
-    width: "90%",
-    aspectRatio: 3 / 4,
-    borderRadius: 18,
-    marginBottom: 20,
-    marginTop: 20,
   },
   note: {
     color: "#fff",

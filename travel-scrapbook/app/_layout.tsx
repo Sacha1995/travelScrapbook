@@ -7,6 +7,7 @@ import AddTripModal from "@/components/AddTripModal";
 import useTripsStore from "@/src/useTripsStore";
 import IconButton from "@/components/IconButton";
 import { ThemeProvider } from "@shopify/restyle";
+import Theme from "@/theme/theme";
 
 const RootLayout = () => {
   const { trips, selectedTrip, setTrips, addTrip, updateSelectedTrip } =
@@ -76,7 +77,7 @@ const RootLayout = () => {
   };
 
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={Theme}>
       <View style={{ flex: 1 }}>
         <Stack>
           <Stack.Screen
